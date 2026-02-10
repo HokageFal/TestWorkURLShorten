@@ -7,7 +7,8 @@ from typing import Generator, Optional
 class Database:
     def __init__(self, db_path: str = "urls.db"):
         self.db_path = db_path
-        self._ensure_db_directory()
+        if db_path != ":memory:":
+            self._ensure_db_directory()
         self.init_db()
 
     def _ensure_db_directory(self) -> None:
@@ -34,12 +35,12 @@ class Database:
                 CREATE TABLE IF NOT EXISTS urls (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     original_url TEXT NOT NULL,
-                    short_code TEXT UNIQUE NOT NULL,
+                    short_code TEXT NOT NULL,
                     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
                 )
             """)
             cursor.execute("""
-                CREATE INDEX IF NOT EXISTS idx_short_code 
+                CREATE UNIQUE INDEX IF NOT EXISTS idx_short_code 
                 ON urls(short_code)
             """)
 
